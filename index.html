@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body{
+			margin: 0;
+			height: 100vh;
+			width: 100vw;
+		}
+		canvas{
+			height: 50vw;
+			width: 50vw;
+			background-color: lavender;
+			float: left;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvasSrc"></canvas>
+	<canvas id="canvasDest"></canvas>
+</body>
+<script type="text/javascript">
+	var img = new Image();
+	
+	var source = {
+		canvas:document.querySelector('#canvasSrc'), 
+	}
+	source.context = source.canvas.getContext('2d')
+	var dest = {
+		canvas:document.querySelector('#canvasDest')
+	}
+	dest.context = dest.canvas.getContext('2d');
+
+	img.onload = function(){
+		source.context.drawImage(img, 0, 0);
+		const data = getImageData(source.canvas, source.context);
+		
+		saveImageData(dest, data);
+	}
+	function saveImageData(sourceElement, data){
+		var imgData = sourceElement.context.createImageData( 1,1);
+		for(var row=0; row< data.length; row++){
+			for(var col=0; col< data[0].length; col++){
+				debugger;
+				imgData.data[0] = data[row][col].r;
+				imgData.data[1] = data[row][col].g;
+				imgData.data[2] = data[row][col].b;
+				imgData.data[3] = data[row][col].a;
+				sourceElement.context.putImageData( imgData, col, row );
+			}
+		}
+
+	}
+	function getImageData(element, context){
+		var imageData = [];
+		var maxWidth = element.width;
+		var maxHeight = element.height;
+		for(let height=0; height<=maxHeight; height++){
+			imageData.push([]);
+			for(let width=0; width<=maxWidth; width++){
+				let data = context.getImageData(width, height, width+1, height+1).data;
+				imageData[height][width] = { r: data[0], g:data[1], b:data[2], a:data[3]};
+			}
+		}
+		return imageData;
+	}
+	img.src='index-flowers.jpg';
+</script>
+</html>
